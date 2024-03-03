@@ -9,11 +9,7 @@ import router from './router'
 //初始化引入样式文件
 import '@/styles/common.scss'
 
-//测试接口函数
-import { getCategory } from '@/apis/testAPI'
-getCategory().then(res => {
-    console.log(res)
-})
+
 
 const app = createApp(App)
 
