@@ -2,7 +2,6 @@
 import HomePanel from './HomePanel.vue'
 import { findHotAPI } from '@/apis/home'
 import { onMounted, ref } from 'vue'
-import { useIntersectionObserver } from '@vueuse/core'
 
 const hotList = ref([])
 
