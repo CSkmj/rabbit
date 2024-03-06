@@ -2,6 +2,10 @@
 //表单校验
 
 import { ref } from "vue";
+import {loginAPI} from '@/apis/user'
+import 'element-plus/theme-chalk/el-message.css'
+import { ElMessage } from 'element-plus'
+import { useRouter } from "vue-router";
 
 //1.准备表单对象
 const form = ref({
@@ -28,11 +32,17 @@ const rules = {
 }
 //3.获取form实例做统一校验
 const formRef = ref(null)
+const router = useRouter()
 const doLogin = () => {
-    formRef.value.validate((valid) => {
+    const { account, password } = form.value
+    formRef.value.validate(async (valid) => {
         console.log(valid)
         if(valid) {
             //TODO LOGIN
+            const res = await loginAPI({account, password})
+            console.log(res)
+            ElMessage({type: 'success',message: '登录成功'})
+            router.replace({path: '/'})
         }
     })
 }
