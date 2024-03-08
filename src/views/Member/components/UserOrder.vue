@@ -1,7 +1,6 @@
 <script setup>
-import { getUserOrder } from '@/apis/order'
-import { onMounted, ref } from 'vue'
-
+import { getUserOrder } from "@/apis/order";
+import { onMounted, ref } from "vue";
 
 // tab列表
 const tabTypes = [
@@ -11,25 +10,32 @@ const tabTypes = [
   { name: "receive", label: "待收货" },
   { name: "comment", label: "待评价" },
   { name: "complete", label: "已完成" },
-  { name: "cancel", label: "已取消" }
-]
+  { name: "cancel", label: "已取消" },
+];
 
 // 获取订单列表
-const orderList = ref([])
+const orderList = ref([]);
+const total = ref(0);
 const params = ref({
   orderState: 0,
   page: 1,
-  pageSize: 2
-})
+  pageSize: 2,
+});
 const getOrderList = async () => {
-  const res = await getUserOrder(params.value)
-  orderList.value = res.result.items
-  // total.value = res.result.counts
-}
-onMounted(() => getOrderList())
+  const res = await getUserOrder(params.value);
+  orderList.value = res.result.items;
+  total.value = res.result.counts;
+};
+onMounted(() => getOrderList());
 // tab切换
 const tabChange = (type) => {
-  params.value.orderState = type
+  params.value.orderState = type;
+  getOrderList();
+};
+
+// 页数切换
+const pageChange = (page) => {
+  params.value.page = page
   getOrderList()
 }
 </script>
@@ -38,20 +44,34 @@ const tabChange = (type) => {
   <div class="order-container">
     <el-tabs @tab-change="tabChange">
       <!-- tab切换 -->
-      <el-tab-pane v-for="item in tabTypes" :key="item.name" :label="item.label" />
+      <el-tab-pane
+        v-for="item in tabTypes"
+        :key="item.name"
+        :label="item.label"
+      />
 
       <div class="main-container">
-        <div class="holder-container" v-if="orderList.length === 0">
+        <div
+          class="holder-container"
+          v-if="orderList.length === 0"
+        >
           <el-empty description="暂无订单数据" />
         </div>
         <div v-else>
           <!-- 订单列表 -->
-          <div class="order-item" v-for="order in orderList" :key="order.id">
+          <div
+            class="order-item"
+            v-for="order in orderList"
+            :key="order.id"
+          >
             <div class="head">
               <span>下单时间：{{ order.createTime }}</span>
               <span>订单编号：{{ order.id }}</span>
               <!-- 未付款，倒计时时间还有 -->
-              <span class="down-time" v-if="order.orderState === 1">
+              <span
+                class="down-time"
+                v-if="order.orderState === 1"
+              >
                 <i class="iconfont icon-down-time"></i>
                 <b>付款截止: {{order.countdown}}</b>
               </span>
@@ -59,9 +79,18 @@ const tabChange = (type) => {
             <div class="body">
               <div class="column goods">
                 <ul>
-                  <li v-for="item in order.skus" :key="item.id">
-                    <a class="image" href="javascript:;">
-                      <img :src="item.image" alt="" />
+                  <li
+                    v-for="item in order.skus"
+                    :key="item.id"
+                  >
+                    <a
+                      class="image"
+                      href="javascript:;"
+                    >
+                      <img
+                        :src="item.image"
+                        alt=""
+                      />
                     </a>
                     <div class="info">
                       <p class="name ellipsis-2">
@@ -79,13 +108,22 @@ const tabChange = (type) => {
               <div class="column state">
                 <p>{{ order.orderState }}</p>
                 <p v-if="order.orderState === 3">
-                  <a href="javascript:;" class="green">查看物流</a>
+                  <a
+                    href="javascript:;"
+                    class="green"
+                  >查看物流</a>
                 </p>
                 <p v-if="order.orderState === 4">
-                  <a href="javascript:;" class="green">评价商品</a>
+                  <a
+                    href="javascript:;"
+                    class="green"
+                  >评价商品</a>
                 </p>
                 <p v-if="order.orderState === 5">
-                  <a href="javascript:;" class="green">查看评价</a>
+                  <a
+                    href="javascript:;"
+                    class="green"
+                  >查看评价</a>
                 </p>
               </div>
               <div class="column amount">
@@ -94,11 +132,18 @@ const tabChange = (type) => {
                 <p>在线支付</p>
               </div>
               <div class="column action">
-                <el-button  v-if="order.orderState === 1" type="primary"
-                  size="small">
+                <el-button
+                  v-if="order.orderState === 1"
+                  type="primary"
+                  size="small"
+                >
                   立即付款
                 </el-button>
-                <el-button v-if="order.orderState === 3" type="primary" size="small">
+                <el-button
+                  v-if="order.orderState === 3"
+                  type="primary"
+                  size="small"
+                >
                   确认收货
                 </el-button>
                 <p><a href="javascript:;">查看详情</a></p>
@@ -114,7 +159,13 @@ const tabChange = (type) => {
           </div>
           <!-- 分页 -->
           <div class="pagination-container">
-            <el-pagination background layout="prev, pager, next" />
+            <el-pagination
+              :total="total"
+              @current-change="pageChange"
+              :page-size="params.pageSize"
+              background
+              layout="prev, pager, next"
+            />
           </div>
         </div>
       </div>
@@ -191,7 +242,7 @@ const tabChange = (type) => {
       text-align: center;
       padding: 20px;
 
-      >p {
+      > p {
         padding-top: 10px;
       }
 
